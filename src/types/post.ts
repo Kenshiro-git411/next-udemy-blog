@@ -3,7 +3,7 @@ export type Post = {
     title: string
     content: string
     topImage: string | null
-    createdAt: DateA
+    createdAt: Date
     author: {
         name: string
     }
