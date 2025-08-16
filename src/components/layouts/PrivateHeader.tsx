@@ -18,8 +18,8 @@ export default async function PrivateHeader() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/dashboard" legacyBehavior>
-                        <NavigationMenuLink className="font-bold text-xl">管理ページ</NavigationMenuLink>
+                    <Link href="/dashboard" legacyBehavior passHref>
+                      <NavigationMenuLink className="font-bold text-xl">管理ページ</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
             </NavigationMenuList>

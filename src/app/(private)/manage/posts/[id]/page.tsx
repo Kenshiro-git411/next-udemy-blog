@@ -1,27 +1,35 @@
-import { getPost } from "@/lib/post"
-import { notFound } from "next/navigation"
-import Image from "next/image"
-import { format } from "date-fns"
-import { ja } from "date-fns/locale"
+import { notFound } from "next/navigation";
+import { getOwnPost } from "@/lib/ownPost";
+import Image from "next/image";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
+import { auth } from "@/auth";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github.css"; // コードハイライト用のスタイル
-
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 type Params = {
     params: Promise<{id: string}>
 }
 
-export default async function PostPage({params}: Params) {
+export default async function ShowPage({params}: Params) {
+    const session = await auth(); // ログインしている人のセッション情報取得
+    const userId = session?.user?.id; // idのみを取得
+
+    // emailもしくはidが取得できていなかったらエラー出力
+    if(!session?.user?.email || !userId){
+        throw new Error("不正なリクエストです")
+    }
+
     const {id} = await params
-    const post = await getPost(id)
+    const post = await getOwnPost(userId, id)
 
     if(!post){
         notFound()
@@ -50,16 +58,15 @@ export default async function PostPage({params}: Params) {
           <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="prose max-w-none">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeHighlight]}
-              skipHtml={false} // HTMLスキップを無効化
-              unwrapDisallowed={true} // Markdownの改行を解釈
-            >{post.content}</ReactMarkdown>
-          </div>
+            <div className="prose max-w-none">
+                <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeHighlight]}
+                        skipHtml={false} // HTMLスキップを無効化
+                        unwrapDisallowed={true} // Markdownの改行を解釈
+                >{post.content}</ReactMarkdown>
+            </div>
         </CardContent>
-
       </Card>
     </div>
   )
